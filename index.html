@@ -1,0 +1,505 @@
+<html>
+<head>
+<title>Choose your Container</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<style>
+#content {
+  padding-top: 20px;
+}
+#questions-table {
+  font-size: 20px;
+}
+#questions-table tr td:first-child {
+  width: 33em;
+  padding-left: 10px;
+}
+#questions-table tr td:nth-child(2) {
+  width: 12em;
+  padding-left: 10px;
+}
+#questions-div {
+  padding-top: 10px;
+}
+#results-div {
+  width: 940px;
+  margin: auto;
+  padding-top: 15px;
+}
+div.data-structure {
+  float: left;
+  border: 1px solid black;
+  padding: 7px;
+  margin: 7px;
+}
+img.ds-image {
+  max-width: 200px;
+}
+.ds-name {
+  width: 100%;
+  text-align: center;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+.ds-heading {
+  width: 100%;
+  text-align: center;
+  font-size: 26px;
+  font-weight: bold;
+}
+.ds-language {
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+}
+.ds-languages {
+  padding-top: 10px;
+}
+.lang-desc {
+  display: inline-block;
+  margin-left: 7px;
+}
+#langs-wanted {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 10px;
+}
+#footer {
+  text-align: center;
+  font-size: 20px;
+}
+#clear-all {
+  font-size: 14px;
+}
+</style>
+<script type="text/javascript">
+var $plugins = { };
+
+/* The C++ STL plugin */
+/* email me at dhruvbird@gmail.com to add a plugin for your language.
+ * It's as simple as sending me a JSON for your language that looks like
+ * the JSON for C++ below.
+ *
+ */
+$plugins["C++"] = {
+  "array": { name: "std::vector",
+             url: "http://www.cplusplus.com/reference/vector/"
+  },
+  "sorted array": { name: "std::vector",
+                    url: "http://www.cplusplus.com/reference/vector/"
+  },
+  "ordered map": { name: "std::map",
+             url: "http://www.cplusplus.com/reference/map/"
+  },
+  "unordered map": { name: "std::unordered_map",
+             url: "http://www.cplusplus.com/reference/unordered_map/"
+  },
+  "ordered set": { name: "std::set",
+             url: "http://www.cplusplus.com/reference/set/"
+  },
+  "unordered set": { name: "std::unordered_set",
+             url: "http://www.cplusplus.com/reference/unordered_set/"
+  },
+  "heap": { name: "std::make_heap",
+             url: "http://www.cplusplus.com/reference/algorithm/make_heap/"
+  },
+  "stack": { name: "std::stack",
+             url: "http://www.cplusplus.com/reference/stack/"
+  },
+  "queue": { name: "std::queue",
+             url: "http://www.cplusplus.com/reference/queue/"
+  },
+  "linked list": { name: "std::list",
+             url: "http://www.cplusplus.com/reference/list/"
+  },
+  "PMA": { name: "Roll Your Own",
+             url: "http://en.wikipedia.org/wiki/Roll-Your-Own"
+  },
+  "OMT": { name: "Roll Your Own",
+             url: "http://en.wikipedia.org/wiki/Roll-Your-Own"
+  },
+};
+
+</script>
+</head>
+<body>
+
+<div id="content">
+  <div class="ds-heading">Choose Your Container <a id="clear-all" href="">[Clear All Filters]</a></div>
+  <div id="questions-div">
+  </div>
+  <div id="langs-wanted">
+    <span>Which languages do you want containers for?</span>
+  </div>
+  <div id="results-div">
+  </div>
+</div>
+
+<script type="text/javascript">
+var questions = [
+  { i : "insert-order",
+    q: "I want to retrieve (or iterate) in insert (or reverse-insert) order",
+    opts: [ "Yes", "No" ],
+	exclude: { "Yes": [ "lookups-using", "ordered-iteration", "key-type",
+	             "contiguous-with-offset", "workload-type",
+			     "value-is-simple-type", "binary-searchable", "hashable",
+			     "has-heap-property", "random-updates" ],
+			   "No": [ "want-queue", "want-stack" ]
+	},
+	discards: { "Yes": [ "unordered map", "unordered set" ], "No": [ "linked list", "queue", "stack" ] }
+  },
+  { i : "lookups-using",
+	q : "I am interested in lookups using",
+    opts: [ "Keys", "Values" ],
+	exclude: { "Keys": [ "value-is-simple-type", "binary-searchable", "hashable" ],
+	           "Values": [ "contiguous-with-offset" ],
+	},
+	discards: { "Keys": [ "linked list", "ordered set", "unordered set" ],
+				"Values": [ "linked list", "ordered map", "unordered map" ]
+	}
+  },
+  { i : "ordered-iteration",
+	q : "I want key/value (must be same as lookups) ordered iteration",
+    opts: [ "Yes", "No", "Dont_Care" ],
+	exclude: { "Yes": [ "has-heap-property" ],
+	           "No": [ "want-queue", "want-stack" ],
+			   "Dont_Care": [ ]
+	},
+	discards: { "Yes": [ "queue", "stack", "unordered map", "unordered set", "linked list", "heap" ],
+	            "No": [ "ordered set", "ordered map", "sorted array", "PMA", "OMT" ],
+				"Dont_Care": [ ]
+	}
+  },
+  { i : "key-type",
+    q: "My keys will be",
+    opts: [ "Integers", "Strings", "Clear" ],
+	exclude: { "Integers": [ ],
+	           "Strings": [ "contiguous-with-offset", "want-queue", "want-stack" ],
+			   "Clear": [ ]
+    },
+	discards: { "Integers": [ "OMT", "queue", "stack" ], "Strings": [ "OMT" ], "Clear": [ ] }
+  },
+  { i : "contiguous-with-offset",
+    q: "My integer keys will start at 'K' and be contiguous",
+    opts: [ "Yes", "No" ],
+	exclude: { "Yes": [ "binary-searchable", "hashable" ],
+	           "No": [ ]
+	},
+	discards: { "Yes": [ ], "No": [ "array", "OMT", "queue", "stack" ] }
+  },
+  { i : "workload-type",
+    q: "My workload is mostly",
+    opts: [ "Inserts", "Queries", "Both" ],
+	exclude: { "Inserts": [ ], "Queries": [ ], "Both": [ ] },
+	discards: { "Inserts": [ ], "Queries": [ ], "Both": [ ] }
+  },
+  { i : "value-is-simple-type",
+    q: "My Value is a simple type (i.e. string, integer, etc...)",
+    opts: [ "Yes", "No" ],
+	exclude: { "Yes": [ "binary-searchable", "hashable" ],
+	           "No": [ ]
+	},
+	discards: { "Yes": [ ], "No": [ ] }
+  },
+  { i : "binary-searchable",
+    q: "My Value is binary-searchable",
+    opts: [ "Yes", "No" ],
+	exclude: { "Yes": [ ], "No": [ ] },
+	discards: { "Yes": [ ], "No": [ "ordered set", "ordered map", "sorted array", "PMA", "heap" ] }
+  },
+  { i : "hashable",
+    q: "My Value is hashable",
+    opts: [ "Yes", "No" ],
+	exclude: { "Yes": [ ], "No": [ ] },
+	discards: { "Yes": [ ], "No": [ "unordered set", "unordered map" ] }
+  },
+  { i : "has-heap-property",
+    q: "I shall always retrieve the element with the smallest (or largest) key/value",
+    opts: [ "Yes", "No" ],
+	exclude: { "Yes": [ ], "No": [ ] },
+	discards: { "Yes": [ "unordered set", "unordered map" ], "No": [ "heap" ] }
+  },
+
+  { i : "want-queue",
+    q: "I want a Queue (FIFO)",
+    opts: [ "Yes", "No" ],
+	exclude: { "Yes": [ "want-stack", "random-updates" ],
+	           "No": [ ]
+	},
+	discards: { "Yes": [ "unordered set", "unordered map", "sorted array", "ordered map", "ordered set", "PMA", "OMT", "heap", "stack" ], "No": [ ] }
+  },
+  { i : "want-stack",
+    q: "I want a Stack (LIFO)",
+    opts: [ "Yes", "No" ],
+	exclude: { "Yes": [ "random-updates" ],
+	           "No": [ ]
+	},
+	discards: { "Yes": [ "unordered set", "unordered map", "sorted array", "ordered map", "ordered set", "PMA", "OMT", "heap", "queue" ], "No": [ ] }
+  },
+  { i : "random-updates",
+    q: "I want to insert/delete random entries",
+    opts: [ "Yes", "No" ],
+	exclude: { "Yes": [ ], "No": [ ] },
+	discards: { "Yes": [ "sorted array", "array", ], "No": [ ] }
+  }
+];
+
+var data_structures = [ "array", "sorted array", "ordered map", "unordered map",
+                        "ordered set", "unordered set", "heap", "stack", "queue",
+						"linked list", "PMA", "OMT" ];
+						
+var ds_refs = {
+  "unordered set": {
+    url: "http://en.wikipins.org/a/hash_table",
+	image: "http://upload.wikimedia.org/wikipedia/commons/7/7d/Hash_table_3_1_1_0_1_0_0_SP.svg"
+  },
+  "unordered map": {
+    url: "http://en.wikipins.org/a/hash_table",
+	image: "http://upload.wikimedia.org/wikipedia/commons/7/7d/Hash_table_3_1_1_0_1_0_0_SP.svg"
+  },
+  "ordered map": {
+    url: "http://en.wikipins.org/a/Binary_search%20tree",
+	image: "http://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Binary_search_tree.svg/240px-Binary_search_tree.svg.png"
+  },
+  "ordered set": {
+    url: "http://en.wikipins.org/a/Binary_search%20tree",
+	image: "http://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Binary_search_tree.svg/240px-Binary_search_tree.svg.png"
+  },
+  "array": {
+    url: "http://en.wikipins.org/a/array_data_structure",
+	image: "http://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Array_of_array_storage.svg/240px-Array_of_array_storage.svg.png"
+  },
+  "sorted array": {
+    url: "http://en.wikipins.org/a/sorted_array",
+	image: "http://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Array_of_array_storage.svg/240px-Array_of_array_storage.svg.png"
+  },
+  "heap": {
+    url: "http://en.wikipins.org/a/Binary_heap",
+	image: "http://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Max-heap.png/240px-Max-heap.png"
+  },
+  "stack": {
+    url: "http://en.wikipins.org/a/stack_%28abstract_data_type%29",
+	image: "http://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Data_stack.svg/240px-Data_stack.svg.png"
+  },
+  "queue": {
+    url: "http://en.wikipins.org/a/queue_%28abstract_data_type%29",
+	image: "http://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Data_Queue.svg/240px-Data_Queue.svg.png"
+  },
+  "PMA": {
+    url: "http://dhruvbird.blogspot.com/2013/03/pma-packed-memory-array.html",
+	image: "http://3.bp.blogspot.com/-OJhG2G285W0/UUKcYooA7GI/AAAAAAAACf0/nK_uuACbKG8/s480/PMA_thresholds.png"
+  },
+  "OMT": {
+    url: "http://en.wikipedia.org/wiki/Order-maintenance_problem",
+	image: "http://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Depiction_of_indirection_in_a_tree_based_solution_to_the_order-maintenance_problem.svg/220px-Depiction_of_indirection_in_a_tree_based_solution_to_the_order-maintenance_problem.svg.png"
+  },
+  "linked list": {
+    url: "http://en.wikipins.org/a/linked_list",
+	image: "http://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Singly-linked-list.svg/240px-Singly-linked-list.svg.png"
+  }
+};
+
+function draw_questions() {
+  var qtable = $("<table></table>").
+    attr("border", "1").
+	attr("id", "questions-table").
+	attr('align', 'center');
+    questions.forEach(function(elem, i, array) {
+    // console.log(arguments);
+	var qrow = $("<tr></tr>");
+	var qtext = $("<td></td>").html(elem.q);
+	var qopts = $("<td></td>");
+	qrow.append(qtext);
+	elem.opts.forEach(function(opt, j, opts) {
+	  var radio = $("<input type='radio' />").
+	                attr('name', elem.i).
+				    val(opt)
+					.attr('index', i);
+	  var span = $("<span></span>").html(opt);
+	  qopts.append(radio).append(span);
+	});
+	qrow.append(qopts);
+	qtable.append(qrow);
+  });
+  $("#questions-div").append(qtable);
+}
+
+function get_language_links(name, langs_wanted) {
+    var ldivs = $("<div></div>").addClass("ds-languages");
+	// console.log("langs_wanted:", langs_wanted);
+    langs_wanted.forEach(function(lang) {
+        var ldiv = $("<div></div>").addClass("ds-language");
+		var lname = $("<span></span>").html(lang + ": ");
+		var llink = $("<a></a>").
+			html($plugins[lang][name].name).
+			attr('href', $plugins[lang][name].url).
+			attr('target', '_blank');
+		ldiv.append(lname).append(llink);
+		ldivs.append(ldiv);
+	});
+	return ldivs;
+}
+
+function get_data_structure_box(name, url, image, langs_wanted) {
+    var rdiv = $("<div></div>").addClass("data-structure");
+	var title = $("<a></a>").addClass("ds-name").
+		html(name).
+		attr('href', url);
+	var img = $("<img>").addClass("ds-image").
+		attr('src', image);
+	rdiv.append(title).append(img);
+	rdiv.append(get_language_links(name, langs_wanted));
+    return rdiv;
+}
+
+function get_selected_languages() {
+    // Get from DOM on the current page.
+    var langs = $("input[name=lang-wanted]:checked").map(function() {
+        return $(this).val();
+    }).toArray();
+    return langs;
+}
+
+function show_my_options() {
+  var opts = { };
+  data_structures.forEach(function(name) {
+    opts[name] = { enabled: true };
+  });
+  var langs_wanted = get_selected_languages();
+  questions.forEach(function(q, i) {
+    var sel = $("#questions-div [name=" + q.i + "]:checked")
+    if (sel.length == 0) return;
+	if (sel.closest('tr').css('display') == 'none') return;
+	q.discards[sel.val()].forEach(function(bad, j) {
+	  opts[bad].enabled = false;
+	});
+  });
+  opts = data_structures.map(function(name) {
+    return { name: name, enabled: opts[name].enabled };
+  }).filter(function isEnabled(ds) {
+    return ds.enabled == true;
+  }).map(function(ds) {
+    return ds.name;
+  });
+
+  console.log("Your options are:", opts);
+  $("#results-div > div").remove();
+  var results = opts.map(function(opt, i) {
+    var rdiv = get_data_structure_box(opt,
+									  ds_refs[opt].url,
+								      ds_refs[opt].image,
+									  langs_wanted);
+	if (i > 0 && i % 4 == 0) {
+	  rdiv.css('clear', 'both');
+	}
+	return rdiv;
+  });
+  if (results.length > 0) {
+    $("#results-div").append($("<div></div>").
+	  html('You can use one of these').
+	  addClass('ds-heading'));
+  } else {
+    $("#results-div").append($("<div></div>").
+	  addClass('ds-heading').
+	  html('Sorry, no options to offer :-('));
+  }
+  results.push($("<div style='clear: both;'></div>"));
+  $("#results-div").append(results);
+}
+
+function get_url_hash() {
+	var url_hash = '';
+	var allq = $("#questions-table tr input:checked");
+	allq.each(function(i, input) {
+	  var chk_val  = $(this).val();
+	  var chk_name = $(this).attr('name');
+	  var idx      = $(this).attr('index');
+	  if (url_hash.length > 0) url_hash += '&';
+	  url_hash += chk_name + "=" + chk_val;
+	});
+	var langs = get_selected_languages();
+	langs.forEach(function(lang) {
+	  if (url_hash.length > 0) url_hash += '&';
+	  url_hash += 'lang-wanted=' + lang;
+	});
+	return url_hash;
+}
+
+function on_option_clicked(event) {
+    // alert(chk_val);
+	if (event && $(this).val() == 'Clear') {
+	  $(this).closest('td').find('input').attr('checked', '');
+	}
+    var allq = $("#questions-table tr");
+    allq.css('display', '');
+    allq.each(function(k, tr_global) {
+	  if ($(this).find("input:checked").length == 0) return;
+	  if ($(this).css('display') == 'none') return;
+	  var chk_val  = $(this).find("input:checked").val();
+	  var chk_name = $(this).find("input:checked").attr('name');
+	  var idx      = $(this).find("input:checked").attr('index');
+	  var to_hide = questions[idx].exclude[chk_val];
+	  $("#questions-table tr").each(function(i, tr) {
+	    if (i <= k) return;
+	    to_hide.forEach(function(hstr, j) {
+		  if ($(tr).find("[name=" + hstr + "]").length > 0) {
+		    $(tr).css('display', 'none');
+		  }
+	    });
+	  });
+    });
+	show_my_options();
+	window.location.hash = get_url_hash();
+}
+
+function add_click_handlers() {
+  $("#questions-div").delegate('input', 'click', on_option_clicked);
+  $("#langs-wanted").delegate('input', 'click', on_option_clicked);
+}
+
+function get_hash_parts(hash) {
+  var url_hash = hash.substr(1);
+  var parts = url_hash.split(/&/);
+  return parts;
+}
+
+function try_loading_from_url_hash() {
+  var parts = get_hash_parts(window.location.hash);
+  parts.forEach(function(part) {
+    var feature = part.split(/=/)[0];
+	var value   = part.split(/=/)[1];
+	$("#questions-div input[name=" + feature + "][value='" + value + "']").attr('checked', 'checked');
+	$("#langs-wanted input[name=" + feature + "][value='" + value + "']").attr('checked', 'checked');
+  });
+}
+
+function draw_language_options() {
+	var lopts = $("#langs-wanted");
+    for (var lang in $plugins) {
+		var option = $("<input />").
+			attr("type", "checkbox").
+			attr("name", "lang-wanted").
+			val(lang);
+		var desc = $("<span></span>").
+			addClass("lang-desc").
+			html(lang);
+		lopts.append(desc).append(option);
+    }
+}
+
+$().ready(function() {
+  draw_questions();
+  draw_language_options();
+  try_loading_from_url_hash();
+  add_click_handlers();
+  on_option_clicked();
+});
+</script>
+
+<div style="height:150px;">&nbsp;</div>
+<div id="footer">
+<span id="contact">Contact: <a href="mailto:dhruvbird@gmail.com">dhruvbird@gmail.com</a></span>
+</div>
+</body>
+</html>
