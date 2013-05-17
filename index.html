@@ -218,7 +218,8 @@ var questions = [
 	discards: { "Yes": [ ], "No": [ ] }
   },
   { i : "binary-searchable",
-    q: "My Value is <a href='http://en.wikipedia.org/wiki/Monotonic_function'>binary-searchable</a>",
+    q: "My Value is <a href='http://en.wikipedia.org/wiki/Monotonic_function'>binary-searchable</a> " +
+	   "[<a href='http://oj.51isoft.com/contest/problem_show.php?pid=27293'>*</a>]",
     opts: [ "Yes", "No" ],
 	exclude: { "Yes": [ ], "No": [ ] },
 	discards: { "Yes": [ ], "No": [ "ordered set", "ordered map", "sorted array", "PMA", "heap" ] }
@@ -242,7 +243,7 @@ var questions = [
 	exclude: { "Yes": [ "want-stack", "random-updates" ],
 	           "No": [ ]
 	},
-	discards: { "Yes": [ "unordered set", "unordered map", "sorted array", "ordered map", "ordered set", "PMA", "OMT", "heap", "stack" ], "No": [ ] }
+	discards: { "Yes": [ "unordered set", "unordered map", "sorted array", "ordered map", "ordered set", "PMA", "OMT", "heap", "stack" ], "No": [ "queue" ] }
   },
   { i : "want-stack",
     q: "I want a Stack (LIFO)",
@@ -250,7 +251,7 @@ var questions = [
 	exclude: { "Yes": [ "random-updates" ],
 	           "No": [ ]
 	},
-	discards: { "Yes": [ "unordered set", "unordered map", "sorted array", "ordered map", "ordered set", "PMA", "OMT", "heap", "queue" ], "No": [ ] }
+	discards: { "Yes": [ "unordered set", "unordered map", "sorted array", "ordered map", "ordered set", "PMA", "OMT", "heap", "queue" ], "No": [ "stack" ] }
   },
   { i : "random-updates",
     q: "I want to insert/delete random entries",
@@ -489,7 +490,7 @@ function add_click_handlers() {
   $("#questions-div").delegate('input', 'click', on_option_clicked);
   $("#langs-wanted").delegate('input', 'click', on_option_clicked);
   $("#questions-div").delegate('.radio-text', 'click', on_option_clicked);
-  $("#langs-wanted").delegate('.lang-desc', 'click', on_option_clicked); // FIXME
+  $("#langs-wanted").delegate('.lang-desc', 'click', on_option_clicked);
 }
 
 function get_hash_parts(hash) {
