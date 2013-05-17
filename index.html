@@ -184,10 +184,10 @@ var questions = [
 	}
   },
   { i : "key-type",
-    q: "My keys will be",
+    q: "My key/value (same as lookup) will be",
     opts: [ "Integers", "Strings", "Clear" ],
-	exclude: { "Integers": [ ],
-	           "Strings": [ "contiguous-with-offset", "want-queue", "want-stack" ],
+	exclude: { "Integers": [ "value-is-simple-type" ],
+	           "Strings": [ "contiguous-with-offset", "want-queue", "want-stack", "value-is-simple-type" ],
 			   "Clear": [ ]
     },
 	discards: { "Integers": [ "OMT", "queue", "stack" ], "Strings": [ "OMT" ], "Clear": [ ] }
