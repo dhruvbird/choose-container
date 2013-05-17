@@ -75,6 +75,9 @@ img.ds-image {
 #clear-all {
   font-size: 14px;
 }
+.radio-with-text, .radio-with-text input, .lang-check-with-text, .lang-check-with-text input {
+  cursor: pointer;
+}
 </style>
 <script type="text/javascript">
 var $plugins = { };
@@ -328,8 +331,14 @@ function draw_questions() {
 	                attr('name', elem.i).
 				    val(opt)
 					.attr('index', i);
-	  var span = $("<span></span>").html(opt);
-	  qopts.append(radio).append(span);
+	  var radio_text = $("<span></span>").
+	    addClass('radio-text').
+		attr('value', opt).
+		html(opt);
+	  var span = $("<span></span>").
+	    addClass('radio-with-text');
+	  span.append(radio).append(radio_text);
+	  qopts.append(span);
 	});
 	qrow.append(qopts);
 	qtable.append(qrow);
@@ -440,8 +449,19 @@ function get_url_hash() {
 
 function on_option_clicked(event) {
     // alert(chk_val);
-	if (event && $(this).val() == 'Clear') {
-	  $(this).closest('td').find('input').attr('checked', '');
+	var elem = event ? $(this) : null;
+	if (elem && elem.is('span.radio-text')) {
+	  elem.closest('td').find('input').prop('checked', false);
+	  var input = elem.parent().find('input');
+	  input.prop('checked', true);
+	  elem = input;
+	} else if (elem && elem.is("span.lang-desc")) {
+	  var input = elem.parent().find('input');
+	  input.prop('checked', !input.prop('checked'));
+	}
+
+	if (event && elem.val() == 'Clear') {
+	  elem.closest('td').find('input').prop('checked', false);
 	}
     var allq = $("#questions-table tr");
     allq.css('display', '');
@@ -468,6 +488,8 @@ function on_option_clicked(event) {
 function add_click_handlers() {
   $("#questions-div").delegate('input', 'click', on_option_clicked);
   $("#langs-wanted").delegate('input', 'click', on_option_clicked);
+  $("#questions-div").delegate('.radio-text', 'click', on_option_clicked);
+  $("#langs-wanted").delegate('.lang-desc', 'click', on_option_clicked); // FIXME
 }
 
 function get_hash_parts(hash) {
@@ -481,8 +503,8 @@ function try_loading_from_url_hash() {
   parts.forEach(function(part) {
     var feature = part.split(/=/)[0];
 	var value   = part.split(/=/)[1];
-	$("#questions-div input[name=" + feature + "][value='" + value + "']").attr('checked', 'checked');
-	$("#langs-wanted input[name=" + feature + "][value='" + value + "']").attr('checked', 'checked');
+	$("#questions-div input[name=" + feature + "][value='" + value + "']").prop('checked', true);
+	$("#langs-wanted input[name=" + feature + "][value='" + value + "']").prop('checked', true);
   });
 }
 
@@ -496,7 +518,10 @@ function draw_language_options() {
 		var desc = $("<span></span>").
 			addClass("lang-desc").
 			html(lang);
-		lopts.append(desc).append(option);
+	    var outer = $("<span></span>").
+		  addClass('lang-check-with-text');
+		outer.append(desc).append(option)
+		lopts.append(outer);
     }
 }
 
